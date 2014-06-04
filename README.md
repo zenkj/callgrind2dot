@@ -41,9 +41,22 @@ lua callgrind2dot.lua --list-functions test/test.callgrind
                   pushstr     0.03          3 /home/jzjian/bin/lua           ???                           
 ```
 
-* focus on functions
+* focus on function
 ```
 lua callgrind2dot.lua --focus-function=pmain --dot-file=test/pmain.dot test/test.callgrind
 dot -Tpng -otest/pmain.png test/pmain.dot
 ```
 ![pmain](https://raw.github.com/zenkj/callgrind2dot/master/test/pmain.png)
+
+history
+=======
+
+There's a great tool called gprof2dot written in python(http://gprof2dot.jrfonseca.googlecode.com/) already.
+This tool is claimed to be able to handle callgrind file format. After some trial, I find the output dot file
+has wrong cost percentage. I reported this issue to the auther. During the time to wait for the author to fix
+this issue, I plan to write one by myself.
+
+After some research on the callgrind file format, I find it's a very simple format. So it should be enough
+to write this tool in my favorite script language lua. At last this project is created.
+
+BTW, the author of gprof2dot has already fixed that issue(still not try it because of this project).
