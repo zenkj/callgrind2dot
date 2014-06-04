@@ -51,7 +51,7 @@ dot -Tpng -otest/pmain.png test/pmain.dot
 history
 =======
 
-There's a great tool called gprof2dot written in python(http://gprof2dot.jrfonseca.googlecode.com/) already.
+There's a tool called gprof2dot written in python(http://gprof2dot.jrfonseca.googlecode.com/) already.
 This tool is claimed to be able to handle callgrind file format. After some trial, I find the output dot file
 has wrong cost percentage. I reported this issue to the auther. During the time to wait for the author to fix
 this issue, I plan to write one by myself.
