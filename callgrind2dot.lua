@@ -434,7 +434,7 @@ for k,v in pairs(FN) do
     local sfl = getfile(fl)
     local selfcost = v.selfcost*100/TOTALS
     local cost = v.cost*100/TOTALS
-    local data = string.format('%d [label="%s\\n%s\\n%.2f/%.2f%%\\n%d"];\n', v.id, sob, fn, selfcost, cost, v.count)
+    local data = string.format('%d [label="%s\\n%s\\n%.2f%% / %.2f%%\\n%d"];\n', v.id, sob, fn, selfcost, cost, v.count)
     file:write(data)
 
     for k1,v1 in pairs(v.callee) do
