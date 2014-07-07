@@ -133,7 +133,7 @@ local spec_jtable = {
                 local fullfn = packfn(currob, currfl, currfn)
                 currFN = FN[fullfn]
                 if not currFN then
-                    currFN = {cost=0, count=0, id=currfnid, callee={}}
+                    currFN = {selfcost=0, cost=0, count=0, id=currfnid, callee={}}
                     currfnid = currfnid + 1
                     FN[fullfn] = currFN
                 end
@@ -167,7 +167,7 @@ local spec_jtable = {
                 assert(currFN and currFN.callee)
                 local callee = currFN.callee
 
-                local cost = parse_cost(file:read '*l')
+                local cost = parse_cost(file:read '*l', false)
                 assert(cost, "cost should be specified after calls specification")
 
                 assert(currcffn)
@@ -271,7 +271,7 @@ function parse_spec(line)
     return true
 end
 
-function parse_cost(line)
+function parse_cost(line, addtoself)
     local pcount = #POSITIONS
     local ecount = #EVENTS
     local irp = EVENTS.Ir
@@ -298,6 +298,10 @@ function parse_cost(line)
             if currFN then
                 local cost = currFN.cost or 0
                 currFN.cost = cost + n
+                if addtoself then
+                    local selfcost = currFN.selfcost or 0
+                    currFN.selfcost = selfcost + n
+                end
             end
 
             return n
@@ -319,7 +323,7 @@ for line in file:lines() do
         head_count = head_count + 1
     elseif parse_spec(line) then
         spec_count = spec_count + 1
-    elseif parse_cost(line) then
+    elseif parse_cost(line, true) then
         cost_count = cost_count + 1
     else
         local count = empty_count + head_count + spec_count + cost_count + 1
@@ -353,10 +357,11 @@ else
 end
 
 if list_functions then
-    file:write("                function    cost    count       object-file      source-file\n")
+    file:write("                function      cost      count       object-file      source-file\n")
     for k,v in pairs(FN) do
         local ob, fl, fn = unpackfn(k)
-        file:write(string.format("%25s %8.2f %10d %-30s %-30s\n", fn, v.cost*100/TOTALS, v.count, ob, fl))
+        file:write(string.format("%25s %8.2f/%8.2f %10d %-30s %-30s\n",
+                                 fn, v.selfcost*100/TOTALS, v.cost*100/TOTALS, v.count, ob, fl))
     end
     file:close()
     os.exit(0)
@@ -427,8 +432,9 @@ for k,v in pairs(FN) do
     local ob, fl, fn = unpackfn(k)
     local sob = getfile(ob)
     local sfl = getfile(fl)
+    local selfcost = v.selfcost*100/TOTALS
     local cost = v.cost*100/TOTALS
-    local data = string.format('%d [label="%s\\n%s\\n%.2f%%\\n%d"];\n', v.id, sob, fn, cost, v.count)
+    local data = string.format('%d [label="%s\\n%s\\n%.2f/%.2f%%\\n%d"];\n', v.id, sob, fn, selfcost, cost, v.count)
     file:write(data)
 
     for k1,v1 in pairs(v.callee) do
